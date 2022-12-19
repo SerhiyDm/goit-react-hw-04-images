@@ -12,7 +12,7 @@ export const App = () => {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
   const [photos, setPhotos] = useState([]);
-  const [status, setStatus] = useState('idle');
+  const [isLoading, setIsLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const pageSize = 12;
 
@@ -36,11 +36,11 @@ export const App = () => {
           return;
         }
         setPhotos(prevPhotos => [...prevPhotos, ...responce.hits]);
-        setStatus('resolved');
+        setIsLoading(false);
         setTotal(responce.totalHits);
       } catch (error) {
         NotifyError(error.message);
-        setStatus('idle');
+        setIsLoading(false);
       }
     }
   }, [page, query]);
@@ -50,19 +50,19 @@ export const App = () => {
     setPage(1);
     setQuery(validValue);
     setPhotos([]);
-    setStatus('pending');
+    setIsLoading(true);
     setTotal(0);
   };
 
   const handleClick = () => {
     setPage(prevPage => prevPage + 1);
-    setStatus('pending');
+    setIsLoading(true);
   };
 
   return (
     <AppStyled>
       <Searchbar onSubmit={getData} />
-      {status === 'pending' && <Loader />}
+      {isLoading === true && <Loader />}
       <Toaster />
       {photos.length !== 0 && <ImageGallery data={photos} />}
       {page < Math.ceil(total / pageSize) && (
